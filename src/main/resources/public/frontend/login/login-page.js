@@ -85,7 +85,7 @@ async function processLogin(username, password) {
             case 200:
                 
                 [token, isAdmin] = textResponse.split(' ');
-                sessionStorage.setItem("token", token);
+                sessionStorage.setItem("auth-token", token);
                 sessionStorage.setItem("isAdmin", isAdmin);
 
                 setTimeout(function(){

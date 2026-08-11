@@ -33,7 +33,7 @@ public class Main {
     private static ChefService CHEF_SERVICE;
     private static AuthenticationService AUTH_SERVICE;
     private static AuthenticationController AUTH_CONTROLLER;
-    private static IngredientDAO INGREDIENT_DAO;
+    private static IngredientDAO INGREDIENT_DAO;    
     private static IngredientService INGREDIENT_SERVICE;
     private static IngredientController INGREDIENT_CONTROLLER;
     @SuppressWarnings("unused")

@@ -41,11 +41,9 @@ deleteIngredientSubmitButton.addEventListener('click', () => {
 var ingredients = [];
 
 //sessions
-let bearerToken = localStorage.getItem("token") || "";
-// bearerToken = "911d0764-a991-49c7-9cba-79d09a95fbcd";
+let bearerToken = sessionStorage.getItem("auth-token") || "";
+let isAdmin = sessionStorage.getItem('isAdmin');
 
-let isAdmin = localStorage.getItem('isAdmin');
-// isAdmin = false;
 
 /* 
  * TODO: On page load, call getIngredients()
@@ -72,7 +70,7 @@ async function addIngredient(ingredient) {
         return;
     }
     const ingredientPOST = {
-        ingredient
+        name: ingredient
     }
 
     fetch(`${BASE_URL}/ingredients`, {
@@ -140,9 +138,10 @@ async function deleteIngredient(ingredient) {
                 "Authorization": `Bearer ${bearerToken}`
         }
     }).then(async(res) => {
-        if(res.status !== 200){
+        if(res.status !== 204){
             alert( await res.text());
         }
+        deleteIngredientNameInput.value = "";
         getIngredients();
     });
 }

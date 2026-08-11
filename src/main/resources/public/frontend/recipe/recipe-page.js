@@ -32,11 +32,8 @@ window.addEventListener("DOMContentLoaded", () => {
     
 
     //sessions
-    let bearerToken = localStorage.getItem("token") || "";
-    // bearerToken = "911d0764-a991-49c7-9cba-79d09a95fbcd";
-    
-    let isAdmin = localStorage.getItem('isAdmin');
-    // isAdmin = false;
+    let bearerToken = sessionStorage.getItem("auth-token") || "";
+    let isAdmin = sessionStorage.getItem('isAdmin');
 
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
@@ -124,15 +121,17 @@ window.addEventListener("DOMContentLoaded", () => {
      * - On success: clear inputs, fetch latest recipes, refresh the list
      */
     async function addRecipe(name, instructions) {
+        
         const recipe = {
             name,
             instructions
         }
 
-        fetch(`${BASE_URL}/recipes`, {
+        await fetch(`${BASE_URL}/recipes`, {
             method: "POST",
             headers: {
-                "Authorization": `Bearer ${bearerToken}`
+                "Authorization": `Bearer ${bearerToken}`,
+                "Content-Type" : "application/json"
             },
             body: JSON.stringify(recipe)
         }).then(res => {
@@ -140,8 +139,6 @@ window.addEventListener("DOMContentLoaded", () => {
                 addRecipeNameInput.value = "";
                 addRecipeInstructionsInput.value ="";
                 getRecipes();
-            }else{
-                alert("Unkown error");
             }
         })
     }
@@ -170,6 +167,8 @@ window.addEventListener("DOMContentLoaded", () => {
             body: JSON.stringify(recipe)
         }).then(res => {
             if(res.status == 200){
+                updateRecipeNameInput.value = "";
+                updateRecipeInstructionsInput.value = "";
                 getRecipes();
             }
         });
@@ -194,8 +193,9 @@ window.addEventListener("DOMContentLoaded", () => {
                  "Authorization": `Bearer ${bearerToken}`
             }
         }).then(async(res) => {
-            if(res.status !== 200){
-                alert( await res.text());
+            if(res.status == 200){
+                deleteRecipeNameInput.value = "";
+                getRecipes();
             }
         });
     }
@@ -211,6 +211,10 @@ window.addEventListener("DOMContentLoaded", () => {
     async function getRecipes() {
         // Implement get logic here
         fetch(`${BASE_URL}/recipes`).then((res) => {
+            if(res.status == 404){
+                recipeList.innerHTML = "No Recipes Found, Consider adding one."
+                return;
+            }
             res.json().then(a => {
                 recipes = a;
                 refreshRecipeList();
@@ -226,7 +230,6 @@ window.addEventListener("DOMContentLoaded", () => {
      * - Append to list container
      */
     function refreshRecipeList() {
-        console.log(recipes);
         recipeList.innerHTML = "";
         recipes.forEach(recipe => {
             const lineItem = document.createElement("li");
@@ -256,7 +259,7 @@ window.addEventListener("DOMContentLoaded", () => {
             }
         }).then((res) => {
             if(res.status == 200){
-                window.location.href('/login/login-page.html');
+                window.location.href = '/login/login-page.html';
             }
         });
     }
