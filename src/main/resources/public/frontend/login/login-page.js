@@ -86,7 +86,7 @@ async function processLogin(username, password) {
                 
                 [token, isAdmin] = textResponse.split(' ');
                 sessionStorage.setItem("auth-token", token);
-                sessionStorage.setItem("isAdmin", isAdmin);
+                sessionStorage.setItem("is-admin", isAdmin);
 
                 setTimeout(function(){
                     window.location.href = '/recipe/recipe-page.html';

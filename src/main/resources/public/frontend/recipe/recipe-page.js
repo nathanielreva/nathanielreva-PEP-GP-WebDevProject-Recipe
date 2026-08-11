@@ -33,7 +33,7 @@ window.addEventListener("DOMContentLoaded", () => {
 
     //sessions
     let bearerToken = sessionStorage.getItem("auth-token") || "";
-    let isAdmin = sessionStorage.getItem('isAdmin');
+    let isAdmin = sessionStorage.getItem('is-admin') === "true";
 
     /*
      * TODO: Show logout button if auth-token exists in sessionStorage
@@ -196,6 +196,8 @@ window.addEventListener("DOMContentLoaded", () => {
             if(res.status == 200){
                 deleteRecipeNameInput.value = "";
                 getRecipes();
+            }else{
+                alert( await res.text());
             }
         });
     }

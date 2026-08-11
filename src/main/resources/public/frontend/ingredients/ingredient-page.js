@@ -42,7 +42,7 @@ var ingredients = [];
 
 //sessions
 let bearerToken = sessionStorage.getItem("auth-token") || "";
-let isAdmin = sessionStorage.getItem('isAdmin');
+let isAdmin = sessionStorage.getItem('is-admin') === "true";
 
 
 /* 
