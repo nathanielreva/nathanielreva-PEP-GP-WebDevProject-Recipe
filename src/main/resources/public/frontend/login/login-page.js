@@ -12,11 +12,21 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - logout button (optional, for token testing)
  */
 
+const username = document.getElementById('login-input');
+const password = document.getElementById('password-input');
+const login = document.getElementById('login-button');
+const logout = document.getElementById('logout-button');
+
+
 /* 
  * TODO: Add click event listener to login button
  * - Call processLogin on click
  */
 
+login.addEventListener('click', () => {
+    processLogin(username.value, password.value);
+    console.log("hello");
+})
 
 /**
  * TODO: Process Login Function
@@ -39,11 +49,17 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - Use sessionStorage.setItem("key", value) to store auth token and admin flag
  * - Use `window.location.href` for redirection
  */
-async function processLogin() {
+async function processLogin(username, password) {
     // TODO: Retrieve username and password from input fields
     // - Trim input and validate that neither is empty
+ 
+    if(username.trim() === "" || password.trim() === ""){
+        throw new error("Username or password is empty");
+    }
 
     // TODO: Create a requestBody object with username and password
+
+    const requestBody = {username, password};
 
     const requestOptions = {
         method: "POST",
@@ -62,7 +78,27 @@ async function processLogin() {
 
     try {
         // TODO: Send POST request to http://localhost:8081/login using fetch with requestOptions
+        const data = await fetch(`${BASE_URL}/login`, requestOptions);
+        const textResponse = await data.text();
+  
+        switch(data.status){
+            case 200:
+                
+                [token, isAdmin] = textResponse.split(' ');
+                sessionStorage.setItem("token", token);
+                sessionStorage.setItem("isAdmin", isAdmin);
 
+                setTimeout(function(){
+                    window.location.href = '/recipe/recipe-page.html';
+                }, 500)
+                return;
+            case 401:
+                alert("Incorrect Login");
+                return;
+            default:
+                console.log("Unknown Issue");
+                return;
+        }
         // TODO: If response status is 200
         // - Read the response as text
         // - Response will be a space-separated string: "token123 true"
@@ -83,6 +119,8 @@ async function processLogin() {
     } catch (error) {
         // TODO: Handle any network or unexpected errors
         // - Log the error and alert the user
+        console.log(error);
+        alert(`Exception occured: ${error}`);
     }
 }
 

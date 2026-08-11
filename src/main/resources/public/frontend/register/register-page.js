@@ -9,10 +9,23 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - usernameInput, emailInput, passwordInput, repeatPasswordInput, registerButton
  */
 
+const username = document.getElementById('username-input');
+const email = document.getElementById('email-input');
+const password = document.getElementById('password-input');
+const repeatPassword = document.getElementById('repeat-password-input');
 
 /* 
  * TODO: Ensure the register button calls processRegistration when clicked
  */
+
+document.getElementById('register-button').addEventListener('click', () => {
+    if(password.value !== repeatPassword.value){
+        alert("Password and repeat password not matching");
+        return;
+    }
+    processRegistration(username.value, email.value, password.value);
+         
+});
 
 
 /**
@@ -38,12 +51,13 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - Wrap in try/catch
  * - Log error and alert user
  */
-async function processRegistration() {
+async function processRegistration(username, email, password) {
     // Implement registration logic here
 
+
     // Example placeholder:
-    // const registerBody = { username, email, password };
-const requestOptions = {
+    const registerBody = { username, email, password };
+    const requestOptions = {
         method: "POST",
         mode: "cors",
         cache: "no-cache",
@@ -57,5 +71,22 @@ const requestOptions = {
         referrerPolicy: "no-referrer",
         body: JSON.stringify(registerBody)
     };
-    // await fetch(...)
+    
+
+    try{
+        const data =  await fetch(`${BASE_URL}/register`, requestOptions);
+        switch(data.status){
+            case 201:
+                window.location.href = '/login/login-page.html';
+                break;
+            case 409:
+                alert("Username/email already exists");
+                break;
+            default:
+                alert("Registration error");
+        }
+    }catch(error){
+        console.log(error);
+        alert(`An exception occured: ${error}`);
+    }
 }

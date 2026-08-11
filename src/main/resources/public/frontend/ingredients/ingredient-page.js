@@ -13,20 +13,47 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - adminLink (if visible conditionally)
  */
 
+
+const addIngredientNameInput = document.getElementById('add-ingredient-name-input');
+const deleteIngredientNameInput = document.getElementById('delete-ingredient-name-input');
+const ingredientListContainer = document.getElementById('ingredient-list');
+const addIngredientListSubmitButton = document.getElementById('add-ingredient-submit-button');
+const deleteIngredientSubmitButton = document.getElementById('delete-ingredient-submit-button');
+
+
 /* 
  * TODO: Attach 'onclick' events to:
  * - "add-ingredient-submit-button" → addIngredient()
  * - "delete-ingredient-submit-button" → deleteIngredient()
  */
 
+addIngredientListSubmitButton.addEventListener('click', () => {
+    addIngredient(addIngredientNameInput.value);
+});
+deleteIngredientSubmitButton.addEventListener('click', () => {
+    deleteIngredient(deleteIngredientNameInput.value);
+});
+
 /*
  * TODO: Create an array to keep track of ingredients
  */
+
+var ingredients = [];
+
+//sessions
+let bearerToken = localStorage.getItem("token") || "";
+// bearerToken = "911d0764-a991-49c7-9cba-79d09a95fbcd";
+
+let isAdmin = localStorage.getItem('isAdmin');
+// isAdmin = false;
 
 /* 
  * TODO: On page load, call getIngredients()
  */
 
+(function(){
+    getIngredients();
+})();
 
 /**
  * TODO: Add Ingredient Function
@@ -39,8 +66,30 @@ const BASE_URL = "http://localhost:8081"; // backend URL
  * - On success: clear input, call getIngredients() and refreshIngredientList()
  * - On failure: alert the user
  */
-async function addIngredient() {
-    // Implement add ingredient logic here
+async function addIngredient(ingredient) {
+    if(ingredient.trim() == ""){
+        alert("Ingredient cannot be empty");
+        return;
+    }
+    const ingredientPOST = {
+        ingredient
+    }
+
+    fetch(`${BASE_URL}/ingredients`, {
+        method: "POST",
+        headers: {
+            "Authorization": `Bearer ${bearerToken}`
+        },
+        body: JSON.stringify(ingredientPOST)
+    }).then(res => {
+        if(res.status  == 201){
+            addIngredientNameInput.value = "";
+            getIngredients();
+        }else{
+            alert("Unkown error");
+        }
+    })
+
 }
 
 
@@ -54,8 +103,14 @@ async function addIngredient() {
  * - On error: alert the user
  */
 async function getIngredients() {
-    // Implement get ingredients logic here
+    fetch(`${BASE_URL}/ingredients`).then((res) => {
+        res.json().then(a => {
+            ingredients = a;
+            refreshIngredientList();
+        });
+    });
 }
+
 
 
 /**
@@ -69,8 +124,27 @@ async function getIngredients() {
  * - On success: call getIngredients() and refreshIngredientList(), clear input
  * - On failure or not found: alert the user
  */
-async function deleteIngredient() {
+async function deleteIngredient(ingredient) {
     // Implement delete ingredient logic here
+    if(ingredient.trim() == ""){
+        alert("Ingredient cannot be empty");
+        return;
+    }
+
+    const ingredient_find = ingredients.filter(a => a.name === ingredient);
+    const ingredient_id = ingredient_find[0].id;
+
+    fetch(`${BASE_URL}/ingredients/${ingredient_id}`, {
+        method: "DELETE",
+        headers: {
+                "Authorization": `Bearer ${bearerToken}`
+        }
+    }).then(async(res) => {
+        if(res.status !== 200){
+            alert( await res.text());
+        }
+        getIngredients();
+    });
 }
 
 
@@ -85,5 +159,12 @@ async function deleteIngredient() {
  *   - Append to container
  */
 function refreshIngredientList() {
-    // Implement ingredient list rendering logic here
+    
+    ingredientListContainer.innerHTML = "";
+    console.log(ingredients);
+    ingredients.forEach(ingredient => {
+        const lineItem = document.createElement("li");
+        lineItem.innerHTML = `<p>${ingredient.name}</p>`;
+        ingredientListContainer.appendChild(lineItem);
+    })
 }
